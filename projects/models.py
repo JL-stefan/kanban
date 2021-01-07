@@ -29,6 +29,7 @@ class Iteration(ModelBase):
     name = models.CharField(max_length=64, unique=True, verbose_name="迭代名称")
     leader = models.IntegerField(verbose_name="迭代负责人")
     desc = models.CharField(max_length=256, verbose_name="迭代描述")
+    projectID = models.IntegerField(verbose_name="项目ID")
 
 
     def __str__(self):
@@ -44,7 +45,6 @@ class Task(ModelBase):
     user = models.IntegerField(verbose_name="执行者")
     tag = models.CharField(max_length=64, verbose_name="标签")
     desc = models.CharField(max_length=1024, verbose_name="描述")
-    projectID = models.IntegerField(verbose_name="项目ID")
     iterationID = models.IntegerField(verbose_name="迭代ID")
 
     def __str___(self):
