@@ -4,8 +4,7 @@ from ..models import Task
 from ..serializers import TaskSerializer
 from rest_framework.response import Response
 from rest_framework import status
-
-notExist = {}
+from .. import const
 
 class TaskList(APIView):
 
@@ -24,14 +23,14 @@ class TaskList(APIView):
                 serializer = TaskSerializer(taskDetail)
                 return Response(serializer.data, status.HTTP_200_OK)
             except Task.DoesNotExist:
-                return Response(notExist, status=status.HTTP_200_OK)
+                return Response(const.NOT_EXIST, status.HTTP_200_OK)
         else:
             try:
                 taskList = Task.objects.all()
                 serializer = TaskSerializer(taskList, many=True)
                 return Response(serializer.data, status.HTTP_200_OK)
             except Task.DoesNotExist:
-                return Response(notExist, status=status.HTTP_200_OK)
+                return Response(const.NOT_EXIST, status.HTTP_200_OK)
 
 
     def post(self, request, format=None):
@@ -65,7 +64,7 @@ class TaskList(APIView):
                 serializer.save()
                 return Response(serializer.data, status.HTTP_200_OK)
         except Task.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, format=None):
         """
@@ -78,12 +77,28 @@ class TaskList(APIView):
             id = request.query_params.get("id")
             taskDetail = Task.objects.get(id=id)
             taskDetail.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
         except Task.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
 
 
 class TaskStatus(APIView):
 
     def put(self, request, format=None):
-        pass
+        try:
+            # 取参
+            id = request.data.get("id")
+            newStatus = request.data.get("status")
+            # 获取对象
+            taskDetail = Task.objects.get(id=id)
+            # 赋值，修改状态
+            taskDetail.status = newStatus
+            # 提交保存
+            taskDetail.save()
+            # 序列化任务信息，用于返回
+            serializer = TaskSerializer(taskDetail)
+            return Response(serializer.data, status.HTTP_200_OK)
+        except:
+            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
+
+

@@ -4,11 +4,10 @@ from ..serializers import ProjectSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import logging
-from django.http import QueryDict
-import json
+from .. import const
+from ..logger import Logger
 
-notExist = {}
+logger = Logger().logger
 
 class ProjectList(APIView):
 
@@ -19,18 +18,19 @@ class ProjectList(APIView):
         :param format:
         :return:
         """
-        id = request.query_params.get('id', default=0)
-        if id != 0:
-            try:
-                project = Project.objects.get(id=id)
-                serializer = ProjectSerializer(project)
-                return Response(serializer.data, status.HTTP_200_OK)
-            except Project.DoesNotExist:
-                return Response(notExist,status=status.HTTP_400_BAD_REQUEST)
-        else:
-            projects = Project.objects.all()
-            serializer = ProjectSerializer(projects, many=True)
+        id = request.query_params.get('id')
+
+        try:
+            if id:
+                projectList = Project.objects.get(id=id)
+                serializer = ProjectSerializer(projectList)
+            else:
+                projectList = Project.objects.all()
+                serializer = ProjectSerializer(projectList, many=True)
+            logger.info(serializer.data)
             return Response(serializer.data, status.HTTP_200_OK)
+        except Project.DoesNotExist:
+            return Response(const.NOT_EXIST, status.HTTP_200_OK)
 
 
     def post(self, request, format=None):
@@ -43,9 +43,10 @@ class ProjectList(APIView):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            logging.info("新增项目信息:"+str(serializer))
-            return Response(serializer.data, status.HTTP_201_CREATED)
+            logger.info("新增项目信息:"+str(serializer.data))
+            return Response(serializer.data, status.HTTP_200_OK)
         else:
+            logger.error(serializer.errors)
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
@@ -56,15 +57,15 @@ class ProjectList(APIView):
         :param format:
         :return:
         """
-        try:
-            id = request.data.get("id")
+
+        id = request.data.get("id")
+        if isinstance(id, int):
             project = Project.objects.get(id=id)
             serializer = ProjectSerializer(project, request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-        except Project.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.data, status.HTTP_200_OK)
+        return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
 
 
     def delete(self, request, format=None):
@@ -76,10 +77,12 @@ class ProjectList(APIView):
         """
         try:
             id = request.query_params.get("id")
+            id = int(id)
             project = Project.objects.get(id=id)
-            project.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Project.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
+        logger.info(project)
+        project.delete()
+        return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
 
 

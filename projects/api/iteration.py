@@ -4,7 +4,7 @@ from ..models import Iteration
 from rest_framework.response import Response
 from rest_framework import status
 from ..serializers import IterationSerializer
-import json
+from .. import const
 
 class IterationsList(APIView):
 
@@ -16,20 +16,16 @@ class IterationsList(APIView):
         :return:
         """
         id = request.query_params.get("id")
-        if id:
-            try:
+        try:
+            if id:
                 iterDetail = Iteration.objects.get(id=id)
-            except Iteration.DoesNotExist:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            serializer = IterationSerializer(iterDetail)
+            else:
+                iterDetail = Iteration.objects.all()
+            serializer = IterationSerializer(iterDetail, many=True)
             return Response(serializer.data, status.HTTP_200_OK)
-        else:
-            try:
-                iterList = Iteration.objects.all()
-            except Iteration.DoesNotExist:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            serializer = IterationSerializer(iterList, many=True)
-            return Response(serializer.data, status.HTTP_200_OK)
+        except Iteration.DoesNotExist:
+            return Response(const.NOT_EXIST, status.HTTP_400_BAD_REQUEST)
+
 
     def post(self, request, format=None):
         """
@@ -61,7 +57,7 @@ class IterationsList(APIView):
                 serializer.save()
                 return Response(serializer.data, status.HTTP_200_OK)
         except Iteration.DoesNotExit:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, format=None):
         """
@@ -74,6 +70,6 @@ class IterationsList(APIView):
             id = request.query_params.get("id")
             iterDetail = Iteration.objects.get(id=id)
             iterDetail.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Iteration.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
+        except:
+            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)

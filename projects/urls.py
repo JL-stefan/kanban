@@ -10,8 +10,8 @@ from django.conf.urls import url
 urlpatterns = [
     # path('^api/projects', include(projectsUrls)),
     path('', test),
-    url('project', ProjectList.as_view()),
-    url('iteration', IterationsList.as_view()),
-    url('task', TaskList.as_view()),
-    url('task/status', TaskStatus.as_view()),
+    url('project$', ProjectList.as_view()),
+    url('iteration$', IterationsList.as_view()),
+    url('task$', TaskList.as_view()),
+    url('task/status$', TaskStatus.as_view()),
 ]
