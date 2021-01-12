@@ -17,20 +17,18 @@ class TaskList(APIView):
         :return:
         """
         id = request.query_params.get("id")
-        if id:
-            try:
-                taskDetail = Task.objects.get(id=id)
-                serializer = TaskSerializer(taskDetail)
-                return Response(serializer.data, status.HTTP_200_OK)
-            except Task.DoesNotExist:
-                return Response(const.NOT_EXIST, status.HTTP_200_OK)
-        else:
-            try:
+        try:
+            if id:
+                taskList = Task.objects.get(id=id)
+                serializer = TaskSerializer(taskList)
+            else:
                 taskList = Task.objects.all()
                 serializer = TaskSerializer(taskList, many=True)
-                return Response(serializer.data, status.HTTP_200_OK)
-            except Task.DoesNotExist:
-                return Response(const.NOT_EXIST, status.HTTP_200_OK)
+            return Response(serializer.data, status.HTTP_200_OK)
+        except Task.DoesNotExist:
+            return Response(const.NOT_EXIST, status.HTTP_200_OK)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 
     def post(self, request, format=None):
@@ -55,16 +53,15 @@ class TaskList(APIView):
         :param format:
         :return:
         """
-
+        id = request.data.get("id")
         try:
-            id = request.data.get("id")
             taskDetail = Task.objects.get(id=id)
             serializer = TaskSerializer(taskDetail, request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status.HTTP_200_OK)
-        except Task.DoesNotExist:
-            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, format=None):
         """
@@ -73,8 +70,8 @@ class TaskList(APIView):
         :param format:
         :return:
         """
+        id = request.query_params.get("id")
         try:
-            id = request.query_params.get("id")
             taskDetail = Task.objects.get(id=id)
             taskDetail.delete()
             return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
@@ -98,7 +95,7 @@ class TaskStatus(APIView):
             # 序列化任务信息，用于返回
             serializer = TaskSerializer(taskDetail)
             return Response(serializer.data, status.HTTP_200_OK)
-        except:
-            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 

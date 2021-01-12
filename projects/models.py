@@ -40,16 +40,22 @@ class Iteration(ModelBase):
         verbose_name_plural = "迭代信息"
 
 
+STATUS_TODO = 1
+STATUS_DOING = 2
+STATUS_DONE = 3
+STATUS_CANCEL = 4
+
 taskStatus = (
-    (1, "待办"),
-    (2, "进行中"),
-    (3, "已完成")
+    (STATUS_TODO, "待办"),
+    (STATUS_DOING, "进行中"),
+    (STATUS_DONE, "已完成"),
+    (STATUS_CANCEL, "已取消")
 )
 
 class Task(ModelBase):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128, verbose_name="标题")
-    status = models.IntegerField(verbose_name="任务状态", choices=taskStatus, default=1)
+    status = models.IntegerField(verbose_name="任务状态", choices=taskStatus, default=STATUS_TODO)
     user = models.IntegerField(verbose_name="执行者")
     tag = models.CharField(max_length=64, verbose_name="标签")
     desc = models.CharField(max_length=1024, verbose_name="描述")

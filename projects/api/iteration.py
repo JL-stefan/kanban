@@ -18,13 +18,16 @@ class IterationsList(APIView):
         id = request.query_params.get("id")
         try:
             if id:
-                iterDetail = Iteration.objects.get(id=id)
+                iterList = Iteration.objects.get(id=id)
+                serializer = IterationSerializer(iterList)
             else:
-                iterDetail = Iteration.objects.all()
-            serializer = IterationSerializer(iterDetail, many=True)
+                iterList = Iteration.objects.all()
+                serializer = IterationSerializer(iterList, many=True)
             return Response(serializer.data, status.HTTP_200_OK)
         except Iteration.DoesNotExist:
-            return Response(const.NOT_EXIST, status.HTTP_400_BAD_REQUEST)
+            return Response(const.NOT_EXIST, status.HTTP_200_OK)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 
     def post(self, request, format=None):
@@ -49,15 +52,15 @@ class IterationsList(APIView):
         :param format:
         :return:
         """
+        id = request.data.get("id")
         try:
-            id = request.data.get("id")
             iterDetail = Iteration.objects.get(id=id)
             serializer = IterationSerializer(iterDetail, request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status.HTTP_200_OK)
-        except Iteration.DoesNotExit:
-            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, format=None):
         """
@@ -66,10 +69,11 @@ class IterationsList(APIView):
         :param format:
         :return:
         """
+
+        id = request.query_params.get("id")
         try:
-            id = request.query_params.get("id")
             iterDetail = Iteration.objects.get(id=id)
             iterDetail.delete()
             return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
-        except:
-            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)

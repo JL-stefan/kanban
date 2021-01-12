@@ -31,6 +31,8 @@ class ProjectList(APIView):
             return Response(serializer.data, status.HTTP_200_OK)
         except Project.DoesNotExist:
             return Response(const.NOT_EXIST, status.HTTP_200_OK)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 
     def post(self, request, format=None):
@@ -59,13 +61,14 @@ class ProjectList(APIView):
         """
 
         id = request.data.get("id")
-        if isinstance(id, int):
+        try:
             project = Project.objects.get(id=id)
             serializer = ProjectSerializer(project, request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status.HTTP_200_OK)
-        return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 
     def delete(self, request, format=None):
@@ -75,14 +78,21 @@ class ProjectList(APIView):
         :param format:
         :return:
         """
+        # try:
+        #     id = request.query_params.get("id")
+        #     id = int(id)
+        #     project = Project.objects.get(id=id)
+        # except:
+        #     return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
+        # logger.info(project)
+        # project.delete()
+        # return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
+
+        id = request.query_params.get("id")
         try:
-            id = request.query_params.get("id")
-            id = int(id)
-            project = Project.objects.get(id=id)
-        except:
-            return Response(const.BAD_REQUEST, status.HTTP_400_BAD_REQUEST)
-        logger.info(project)
-        project.delete()
-        return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
+            Project.objects.get(id=id).delete()
+            return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
+        except Exception as e:
+            return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 
