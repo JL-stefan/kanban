@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import datetime
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,8 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '864w_(*)2lww$d2-6&f!09tc674@w)$vu2260&z)+_a91=@j89'
 
+JWT_AUTH = {
+    # 配置过期时间
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+}
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1"]
 
@@ -41,6 +48,10 @@ INSTALLED_APPS = [
     'projects',
 ]
 
+# REST_FRAMEWORK = {
+#     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+# }
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -53,12 +64,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'kanban.urls'
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    )
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework.authentication.BasicAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+#     )
+# }
 
 TEMPLATES = [
     {
@@ -72,6 +83,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            # 'libraries':{
+            #     'staticfiles': 'django.templatetags.static',
+            # },
         },
     },
 ]
@@ -140,3 +154,12 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+# drf配置（把配置放在最下方）
+REST_FRAMEWORK = {
+    # 自定义三大认证配置类们
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_jwt.authentication.JSONWebTokenAuthentication'],
+    'DEFAULT_PERMISSION_CLASSES': [],
+    # 'DEFAULT_THROTTLE_CLASSES': [],
+}

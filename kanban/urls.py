@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import path,include
 from projects import urls as projectsUrls
 from django.conf.urls import url
+from rest_framework_jwt.views import ObtainJSONWebToken
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url('^api/projects/', include(projectsUrls)),
+    url('api/login/$', ObtainJSONWebToken.as_view())
 ]
