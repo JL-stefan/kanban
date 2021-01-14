@@ -34,6 +34,7 @@ class IterationSerializer(serializers.ModelSerializer):
     """
     迭代信息序列化
     """
+    name = serializers.CharField(required=True)
     desc = serializers.CharField(required=False, allow_blank=True)
     createAt = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", required=False)
     updateAt = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", required=False)

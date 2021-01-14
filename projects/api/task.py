@@ -82,6 +82,12 @@ class TaskList(APIView):
 class TaskStatus(APIView):
 
     def put(self, request, format=None):
+        """
+        更新任务状态
+        :param request:
+        :param format:
+        :return:
+        """
         try:
             # 取参
             id = request.data.get("id")

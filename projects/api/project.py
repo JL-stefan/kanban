@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .. import const
 from ..logger import Logger
+from ..schema_view import DocParam
 
 # from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser,IsAuthenticatedOrReadOnly,DjangoObjectPermissions,DjangoModelPermissions
@@ -14,10 +15,14 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 logger = Logger().logger
 
 class ProjectList(APIView):
-
+    """ 项目的增删查改 """
     # authentication_classes = (SessionAuthentication, BasicAuthentication)
-    authentication_classes = (JSONWebTokenAuthentication,)
+    # authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
+    coreapi_fields = (
+        DocParam(name="id", location="query", description="项目ID", required=True)
+    )
 
     def get(self, request, format=None):
         """
@@ -26,6 +31,7 @@ class ProjectList(APIView):
         :param format:
         :return:
         """
+        logger.info(request)
         id = request.query_params.get('id')
 
         try:
@@ -40,6 +46,7 @@ class ProjectList(APIView):
         except Project.DoesNotExist:
             return Response(const.NOT_EXIST, status.HTTP_200_OK)
         except Exception as e:
+            logger.error(e.args)
             return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 
@@ -50,6 +57,7 @@ class ProjectList(APIView):
         :param format:
         :return:
         """
+        logger.info(request)
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -67,15 +75,17 @@ class ProjectList(APIView):
         :param format:
         :return:
         """
-
+        logger.info(request)
         id = request.data.get("id")
         try:
             project = Project.objects.get(id=id)
             serializer = ProjectSerializer(project, request.data)
             if serializer.is_valid():
                 serializer.save()
+                logger.info("更新项目信息:" + str(serializer.data))
                 return Response(serializer.data, status.HTTP_200_OK)
         except Exception as e:
+            logger.error(e.args)
             return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 
@@ -95,12 +105,13 @@ class ProjectList(APIView):
         # logger.info(project)
         # project.delete()
         # return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
-
+        logger.info(request)
         id = request.query_params.get("id")
         try:
             Project.objects.get(id=id).delete()
             return Response(const.SUCCESS_REQUEST, status.HTTP_200_OK)
         except Exception as e:
+            logger.error(e.args)
             return Response(e.args, status.HTTP_400_BAD_REQUEST)
 
 
