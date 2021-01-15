@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from .. import const
 from ..logger import Logger
-from ..schema_view import DocParam
 
 # from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser,IsAuthenticatedOrReadOnly,DjangoObjectPermissions,DjangoModelPermissions
@@ -19,10 +18,6 @@ class ProjectList(APIView):
     # authentication_classes = (SessionAuthentication, BasicAuthentication)
     # authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-
-    coreapi_fields = (
-        DocParam(name="id", location="query", description="项目ID", required=True)
-    )
 
     def get(self, request, format=None):
         """

@@ -21,11 +21,13 @@ from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework.documentation import include_docs_urls
 from rest_framework_swagger.views import get_swagger_view
 
+from projects.schema_view import SwaggerSchemaView
+
 schema_view = get_swagger_view(title='API 接口文档')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url('^api/swagger/docs/$', schema_view),
+    url('^api/swagger/docs/$', SwaggerSchemaView.as_view()),
     url('^api/docs/', include_docs_urls(title='API 接口文档')),
     url('^api/projects/', include(projectsUrls)),
     url('^api/login/$', ObtainJSONWebToken.as_view()),

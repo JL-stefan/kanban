@@ -5,13 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from ..serializers import IterationSerializer
 from .. import const
-from ..schema_view import DocParam
+
 
 class IterationsList(APIView):
-
-    coreapi_fields = (
-        DocParam(name="id", location="query", description="项目ID", required=True, type=int)
-    )
 
     def get(self, request, format=None):
         """
